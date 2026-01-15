@@ -109,6 +109,9 @@ jobs:
                 env_file: .env
                 depends_on:
                   - redis
+                dns:
+                  - 8.8.8.8
+                  - 8.8.4.4
 
               worker:
                 image: ghcr.io/${{ github.repository }}:latest
@@ -117,14 +120,20 @@ jobs:
                 env_file: .env
                 depends_on:
                   - redis
+                dns:
+                  - 8.8.8.8
+                  - 8.8.4.4
 
               scheduler:
                 image: ghcr.io/${{ github.repository }}:latest
-                command: uv run taskiq scheduler workers.broker:broker
+                command: uv run taskiq scheduler workers.scheduler:scheduler
                 restart: unless-stopped
                 env_file: .env
                 depends_on:
                   - redis
+                dns:
+                  - 8.8.8.8
+                  - 8.8.4.4
 
             volumes:
               redis_data:
