@@ -5,6 +5,11 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
+# Устанавливаем build зависимости
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
 # Устанавливаем uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
