@@ -11,8 +11,6 @@ from supabase import acreate_client
 
 from config import get_settings
 
-import workers.tasks  # noqa: F401
-
 handler = colorlog.StreamHandler()
 handler.setFormatter(colorlog.ColoredFormatter(
     "%(log_color)s%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -90,3 +88,6 @@ async def shutdown(state: TaskiqState):
     if hasattr(state, "bot") and state.bot:
         await state.bot.session.close()
         logger.info("bot disconnected")
+
+
+import workers.tasks  # noqa: F401
