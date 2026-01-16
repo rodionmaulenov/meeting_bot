@@ -283,6 +283,9 @@ async def on_age_received(
 
     if error == "too_young":
         await message.answer(AgeTemplates.age_too_young())
+        await state.update_data(age=age)
+        await save_rejected_application(state, application_repository, f"age={age}")
+        await state.clear()
         return
 
     if error == "too_old":
