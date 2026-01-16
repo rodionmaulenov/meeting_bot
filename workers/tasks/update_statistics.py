@@ -2,6 +2,7 @@
 import logging
 
 from taskiq import Context, TaskiqDepends
+from aiogram.exceptions import TelegramBadRequest
 
 from workers.broker import broker
 from repositories.statistics_repository import StatisticsRepository
@@ -50,10 +51,16 @@ async def update_statistics(context: Context = TaskiqDepends()) -> bool:
                     text=text,
                 )
                 logger.debug(f"Statistics updated, message_id={message_id}")
+            except TelegramBadRequest as e:
+                if "is not modified" in e.message:
+                    logger.debug(f"Statistics not changed, message_id={message_id}")
+                else:
+                    # Любая другая BadRequest (удалено, нет прав и т.д.) — создаём новое
+                    logger.warning(f"Cannot edit message: {e.message}, creating new")
+                    await _create_new_message(context, text)
             except Exception as e:
-                # Сообщение удалено — создаём новое
-                logger.warning(f"Message not found, creating new: {e}")
-                await _create_new_message(context, text)
+                logger.error(f"Unexpected error: {e}")
+                raise
         else:
             # Создаём новое
             await _create_new_message(context, text)
